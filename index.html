@@ -1,13 +1,89 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="pt-PT">
   <head>
+    <meta charset="UTF-8">
     <title>MB WAY UP!</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
   </head>
+
   <body>
-  
     <h1>MB WAY UP!</h1>
-    <h2>Calendário</h2>
-  
+    <h2>Prémios Não Regulares</h2>
+
+    <div>
+      <label for="start-time">Início:</label>
+      <input type="date" id="start-time" name="start-time" min="2021-09-22" />
+    </div>
+    <div>
+      <label for="end-time">Fim:</label>
+      <input type="date" id="end-time" name="end-time" min="2021-09-22" />
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Dia</th>
+          <th>Hora</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
   </body>
+
+  <script>
+    // Diário
+    //   - início = 22/09/2021 07h12
+    //   - hora ++ 1 | +7
+    //   - min ++ 24
+
+    // Semanal
+    //   - início = 25/09/2021 21h45
+    //   - dia semana ++ 1
+    //   - hora = 2f 11h, 3f 13h, 4f 15h, 5f 17h, 6f 19h, sáb 21h, dom 09h
+    //   - min = 15 | 45, alternadamente
+
+    // Mensal
+    //   - início 25/09/2021 13h
+    //   - último sábado
+    //   - hora ++ 1 | +7
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const start = document.getElementById("start-time");
+      const end = document.getElementById("end-time");
+
+      const today = new Date();
+      const nextMonth = new Date(today);
+      nextMonth.setMonth(today.getMonth() + 1);
+
+      start.valueAsDate = today;
+      end.valueAsDate = nextMonth;
+
+      populateTable();
+    });
+
+    function populateTable() {
+      const startDate = new Date(document.getElementById("start-time").value);
+      const endDate = new Date(document.getElementById("end-time").value);
+      const tbody = document.getElementById("table-body");
+
+      tbody.innerHTML = "";
+
+      for (
+        let date = new Date(startDate);
+        date <= endDate;
+        date.setDate(date.getDate() + 1)
+      ) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>-</td>
+          <td>${date.toLocaleDateString("pt-PT")} - ${date.toLocaleDateString("pt-PT", { weekday: "short" })}</td>
+          <td>--:--</td>
+          <td>-</td>
+        `;
+        tbody.appendChild(row);
+      }
+    }
+  </script>
 </html>
