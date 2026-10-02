@@ -9,3 +9,27 @@ body {
 input[type="date"] {
   color-scheme: dark;
 }
+
+table, tr {
+  border: 1px solid gray;
+  border-collapse: collapse;
+}
+
+thead {
+  font-size: large;
+}
+
+.date-pickers {
+  display: flex;
+  flex-direction: column;
+  gap: .25em;
+  margin-bottom: 10px;
+}
+
+.weekly {
+  background-color: #333;
+}
+
+.monthly {
+  background-color: #555;
+}

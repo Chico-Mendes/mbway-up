@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-PT">
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>MB WAY UP!</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -10,13 +10,15 @@
     <h1>MB WAY UP!</h1>
     <h2>Prémios Não Regulares</h2>
 
-    <div>
-      <label for="start-time">Início:</label>
-      <input type="date" id="start-time" name="start-time" min="2021-09-22" />
-    </div>
-    <div>
-      <label for="end-time">Fim:</label>
-      <input type="date" id="end-time" name="end-time" min="2021-09-22" />
+    <div class="date-pickers">
+      <div>
+        <label for="start-time">Início:</label>
+        <input type="date" id="start-time" name="start-time" min="2021-09-22" />
+      </div>
+      <div>
+        <label for="end-time">Fim:</label>
+        <input type="date" id="end-time" name="end-time" min="2021-09-22" />
+      </div>
     </div>
 
     <table>
@@ -33,32 +35,20 @@
   </body>
 
   <script>
-    // Diário
-    //   - início = 22/09/2021 07h12
-    //   - hora ++ 1 | +7
-    //   - min ++ 24
-
-    // Semanal
-    //   - início = 25/09/2021 21h45
-    //   - dia semana ++ 1
-    //   - hora = 2f 11h, 3f 13h, 4f 15h, 5f 17h, 6f 19h, sáb 21h, dom 09h
-    //   - min = 15 | 45, alternadamente
-
-    // Mensal
-    //   - início 25/09/2021 13h
-    //   - último sábado
-    //   - hora ++ 1 | +7
-
     document.addEventListener("DOMContentLoaded", () => {
       const start = document.getElementById("start-time");
       const end = document.getElementById("end-time");
 
+      // Event listeners
+      start.addEventListener("input", populateTable);
+      end.addEventListener("input", populateTable);
+
       const today = new Date();
-      const nextMonth = new Date(today);
-      nextMonth.setMonth(today.getMonth() + 1);
+      const next2Month = new Date(today);
+      next2Month.setMonth(today.getMonth() + 2);
 
       start.valueAsDate = today;
-      end.valueAsDate = nextMonth;
+      end.valueAsDate = next2Month;
 
       populateTable();
     });
@@ -66,24 +56,179 @@
     function populateTable() {
       const startDate = new Date(document.getElementById("start-time").value);
       const endDate = new Date(document.getElementById("end-time").value);
+
+      const events = [
+        ...getDailyOccurrences(startDate, endDate).map((d) => ({
+          class: "daily",
+          type: "Diário",
+          date: d,
+          value: "20",
+        })),
+        ...getWeeklyOccurrences(startDate, endDate).map((d) => ({
+          class: "weekly",
+          type: "Semanal",
+          date: d,
+          value: "100",
+        })),
+        ...getMonthlyOccurrences(startDate, endDate).map((d) => ({
+          class: "monthly",
+          type: "Mensal",
+          date: d,
+          value: "200",
+        })),
+      ].sort((a, b) => a.date - b.date);
+
       const tbody = document.getElementById("table-body");
 
       tbody.innerHTML = "";
 
-      for (
-        let date = new Date(startDate);
-        date <= endDate;
-        date.setDate(date.getDate() + 1)
-      ) {
+      events.forEach((e) => {
         const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>-</td>
-          <td>${date.toLocaleDateString("pt-PT")} - ${date.toLocaleDateString("pt-PT", { weekday: "short" })}</td>
-          <td>--:--</td>
-          <td>-</td>
-        `;
+        ((row.className = e.class),
+          (row.innerHTML = `
+          <td>${e.type}</td>
+          <td>${e.date.toLocaleDateString("pt-PT")} - ${e.date.toLocaleDateString("pt-PT", { weekday: "narrow" })}</td>
+          <td>${e.date.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit", hour12: false })}</td>
+          <td>${e.value}</td>
+        `));
         tbody.appendChild(row);
+      });
+    }
+
+    // DAILY
+    //   - início = 22/09/2021 07h12
+    //   - hora ++ 1 | +7
+    //   - min ++ 24
+    function getDailyOccurrences(startDate, endDate) {
+      const results = [];
+
+      const baseDate = new Date(2021, 8, 22); // 22/09/2021
+      const baseHour = 7;
+      const baseMinute = 12;
+
+      for (
+        let d = new Date(startDate);
+        d <= endDate;
+        d.setDate(d.getDate() + 1)
+      ) {
+        const days = Math.floor((d - baseDate) / 86400000);
+
+        if (days < 0) continue;
+
+        const occurrence = new Date(d);
+
+        occurrence.setHours(
+          7 + (days % 17), // 7..23 then back to 7
+          (baseMinute + days * 24) % 60, // +24 mod 60
+          0,
+          0,
+        );
+
+        results.push(occurrence);
       }
+
+      return results;
+    }
+
+    // WEEKLY
+    //   - início = 25/09/2021 21h45
+    //   - dia semana ++ 1
+    //   - hora = 2f 11h, 3f 13h, 4f 15h, 5f 17h, 6f 19h, sáb 21h, dom 09h
+    //   - min = 15 | 45, alternadamente
+    const weeklyHours = {
+      0: 9, // Sunday
+      1: 11, // Monday
+      2: 13, // Tuesday
+      3: 15, // Wednesday
+      4: 17, // Thursday
+      5: 19, // Friday
+      6: 21, // Saturday
+    };
+
+    function getWeeklyOccurrences(startDate, endDate) {
+      const results = [];
+
+      // start Saturday Date(2021, 8, 25, 21, 45); 25/09/2021
+      const firstWeek = new Date(2021, 8, 20); // Monday
+
+      let weekIndex = 0;
+
+      while (true) {
+        const weekStart = new Date(firstWeek);
+        weekStart.setDate(firstWeek.getDate() + weekIndex * 7);
+
+        // Sat -> Sun -> Mon -> Tue -> Wed -> Thu -> Fri -> Sat ...
+        const weekday = (6 + weekIndex) % 7;
+
+        const occurrence = new Date(weekStart);
+
+        if (weekday === 0) {
+          // Sunday
+          occurrence.setDate(occurrence.getDate() + 6);
+        } else {
+          // Monday=1 ... Saturday=6
+          occurrence.setDate(occurrence.getDate() + weekday - 1);
+        }
+
+        if (occurrence > endDate) {
+          break;
+        }
+
+        occurrence.setHours(
+          weeklyHours[weekday],
+          weekIndex % 2 === 0 ? 45 : 15,
+          0,
+          0,
+        );
+
+        if (occurrence >= startDate) {
+          results.push(occurrence);
+        }
+
+        weekIndex++;
+      }
+
+      return results;
+    }
+
+    // MONTHLY
+    //   - início 25/09/2021 13h
+    //   - último sábado
+    //   - hora ++ 1 | +7
+    function getMonthlyOccurrences(startDate, endDate) {
+      const results = [];
+
+      let index = 0;
+
+      while (true) {
+        const year = 2021 + Math.floor((8 + index) / 12);
+        const month = (8 + index) % 12;
+
+        // last day of month
+        const occurrence = new Date(year, month + 1, 0);
+
+        // move back until Saturday
+        while (occurrence.getDay() !== 6) {
+          occurrence.setDate(occurrence.getDate() - 1);
+        }
+
+        occurrence.setHours(
+          7 + ((6 + index) % 17), // same hour logic as daily, starting at 7+6=13h
+          0,
+          0,
+          0,
+        );
+
+        if (occurrence > endDate) break;
+
+        if (occurrence >= startDate) {
+          results.push(occurrence);
+        }
+
+        index++;
+      }
+
+      return results;
     }
   </script>
 </html>
