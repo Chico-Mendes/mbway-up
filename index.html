@@ -3,13 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <title>MB WAY UP!</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="stylesheet" href="styles.css" />
   </head>
 
   <body>
-    <h1>MB WAY UP!</h1>
-    <h2>Prémios Não Regulares</h2>
-
+    <hgroup>
+      <h1>MB WAY UP!</h1>
+      <h2>Prémios Não Regulares</h2>
+    </hgroup>
+    
     <div class="date-pickers">
       <div>
         <label for="start-time">Início:</label>
@@ -20,6 +23,19 @@
         <input type="date" id="end-time" name="end-time" min="2021-09-22" />
       </div>
     </div>
+
+    <details class="accordion">
+      <summary>Adicionar ao calendário</summary>
+      <div class="cal-grid">
+        <button>Próximo Diário</button>
+        <button>Próximo Semanal</button>
+        <button>Próximo Mensal</button>
+        <button>Todos Diários</button>
+        <button>Todos Semanais</button>
+        <button>Todos Mensais</button>
+        <button style="grid-column: 2">Todos</button>
+      </div>
+    </details>
 
     <table>
       <thead>
@@ -40,8 +56,8 @@
       const end = document.getElementById("end-time");
 
       // Event listeners
-      start.addEventListener("input", populateTable);
-      end.addEventListener("input", populateTable);
+      start.addEventListener("change", populateTable);
+      end.addEventListener("change", populateTable);
 
       const today = new Date();
       const next2Month = new Date(today);
@@ -56,6 +72,7 @@
     function populateTable() {
       const startDate = new Date(document.getElementById("start-time").value);
       const endDate = new Date(document.getElementById("end-time").value);
+      endDate.setHours(23, 59, 59, 999);
 
       const events = [
         ...getDailyOccurrences(startDate, endDate).map((d) => ({
@@ -82,12 +99,14 @@
 
       tbody.innerHTML = "";
 
+      const weekDays = ["D", "2", "3", "4", "5", "6", "S"];
+
       events.forEach((e) => {
         const row = document.createElement("tr");
         ((row.className = e.class),
           (row.innerHTML = `
           <td>${e.type}</td>
-          <td>${e.date.toLocaleDateString("pt-PT")} - ${e.date.toLocaleDateString("pt-PT", { weekday: "narrow" })}</td>
+          <td>${e.date.toLocaleDateString("pt-PT")} - ${weekDays[e.date.getDay()]}</td>
           <td>${e.date.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit", hour12: false })}</td>
           <td>${e.value}</td>
         `));
