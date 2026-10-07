@@ -12,7 +12,7 @@
       <h1>MB WAY UP!</h1>
       <h2>Prémios Não Regulares</h2>
     </hgroup>
-    
+
     <div class="date-pickers">
       <div>
         <label for="start-time">Início:</label>
@@ -28,10 +28,10 @@
       <summary>Adicionar ao calendário</summary>
       <div class="cal-grid">
         <button>Próximo Diário</button>
-        <button>Próximo Semanal</button>
+        <button disabled>Próximo Semanal</button>
         <button>Próximo Mensal</button>
         <button>Todos Diários</button>
-        <button>Todos Semanais</button>
+        <button disabled>Todos Semanais</button>
         <button>Todos Mensais</button>
         <button style="grid-column: 2">Todos</button>
       </div>
@@ -81,12 +81,12 @@
           date: d,
           value: "20",
         })),
-        ...getWeeklyOccurrences(startDate, endDate).map((d) => ({
-          class: "weekly",
-          type: "Semanal",
-          date: d,
-          value: "100",
-        })),
+        // ...getWeeklyOccurrences(startDate, endDate).map((d) => ({
+        //   class: "weekly",
+        //   type: "Semanal",
+        //   date: d,
+        //   value: "100",
+        // })),
         ...getMonthlyOccurrences(startDate, endDate).map((d) => ({
           class: "monthly",
           type: "Mensal",
@@ -168,7 +168,7 @@
       const results = [];
 
       // start Saturday Date(2021, 8, 25, 21, 45); 25/09/2021
-      const firstWeek = new Date(2021, 8, 20); // Monday
+      const firstWeek = new Date(2021, 8, 20); // Monday 20/09/2021
 
       let weekIndex = 0;
 

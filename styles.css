@@ -87,6 +87,12 @@ thead {
   background-color: #555;
 }
 
+.cal-grid > button:disabled {
+  cursor: default;
+  color: #999;
+  background-color: #333;
+}
+
 .weekly {
   background-color: #333;
 }
