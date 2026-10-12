@@ -64,18 +64,34 @@ thead {
 
 .cal-grid {
   display: grid;
-  width: 75%;
+  width: fit-content;
   justify-self: center;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 0.25rem;
+  align-items: center;
+  grid-template-columns: 1fr auto auto;
+  grid-auto-rows: 2.25rem;
+  gap: 0.25rem 1em;
+}
+
+.cal-grid > p {
+  grid-column: 1 / 3;
+  text-align: start;
+  margin: 0px;
+}
+
+.cal-grid > p:has(+ b) {
+  grid-column: 1;
+}
+
+.cal-grid > p + b {
+  grid-column: 2;
 }
 
 .cal-grid > button {
+  grid-column: 3;
   cursor: pointer;
-  height: 2.5em;
+  height: stretch;
   color: white;
   background-color: black;
-  border: 1px solid #777;
   border-radius: 5px;
 }
 

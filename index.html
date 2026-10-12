@@ -4,9 +4,23 @@
     <meta charset="UTF-8" />
     <title>MB WAY UP!</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="icons/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="icons/favicon-16x16.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="icons/apple-touch-icon.png"
+    />
     <link rel="manifest" href="site.webmanifest" />
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -31,13 +45,23 @@
     <details class="accordion">
       <summary>Adicionar ao calendário</summary>
       <div class="cal-grid">
-        <button>Próximo Diário</button>
-        <button>Próximo Semanal</button>
-        <button>Próximo Mensal</button>
-        <button>Todos Diários</button>
-        <button>Todos Semanais</button>
-        <button>Todos Mensais</button>
-        <button style="grid-column: 2">Todos</button>
+        <p>Próximo prémio diário:</p>
+        <b id="val-nextDaily"></b>
+        <button name="addBtn" data-name="nextDaily">Adicionar</button>
+        <p>Próximo prémio semanal:</p>
+        <b id="val-nextWeekly"></b>
+        <button name="addBtn" data-name="nextWeekly">Adicionar</button>
+        <p>Próximo prémio mensal:</p>
+        <b id="val-nextMonthly"></b>
+        <button name="addBtn" data-name="nextMonthly">Adicionar</button>
+        <p>Todos os prémios diários no período escolhido</p>
+        <button name="addBtn" data-name="allDaily">Adicionar</button>
+        <p>Todos os prémios semanais no período escolhido</p>
+        <button name="addBtn" data-name="allWeekly">Adicionar</button>
+        <p>Todos os prémios mensais no período escolhido</p>
+        <button name="addBtn" data-name="allMonthly">Adicionar</button>
+        <p>Todos os prémios no período escolhido</p>
+        <button name="addBtn" data-name="all">Adicionar</button>
       </div>
     </details>
 
@@ -59,40 +83,99 @@
     document.addEventListener("DOMContentLoaded", () => {
       const start = document.getElementById("start-time");
       const end = document.getElementById("end-time");
+      const addButtons = document.querySelectorAll("button[name='addBtn']");
 
       // Event listeners
-      start.addEventListener("change", populateTable);
-      end.addEventListener("change", populateTable);
+      start.addEventListener("change", handleDateChange);
+      end.addEventListener("change", handleDateChange);
+      addButtons.forEach((btn) =>
+        btn.addEventListener("click", handleBtnClick),
+      );
 
+      // Set Date Pickers
       const today = new Date();
       const next2Month = new Date(today);
       next2Month.setMonth(today.getMonth() + 2);
-
       start.valueAsDate = today;
       end.valueAsDate = next2Month;
 
-      populateTable();
+      // INIT
+      init();
     });
+
+    function init() {
+      populateTable();
+
+      const formatOptions = {
+        dateStyle: "medium",
+        timeStyle: "short",
+      };
+
+      // Get next daily
+      const nextDailyEvent = getNextDailyOccurence();
+      if (nextDailyEvent) {
+        document.getElementById("val-nextDaily").innerHTML =
+          nextDailyEvent.toLocaleString("pt-PT", formatOptions);
+      } else {
+        document.getElementById("val-nextDaily").innerHTML = "N/A";
+        const btn = document.querySelector("button[data-name='nextDaily']");
+        btn && (btn.disabled = true);
+      }
+
+      // Get next weekly
+      const nextWeeklyEvent = getNextWeeklyOccurence();
+      if (nextWeeklyEvent) {
+        document.getElementById("val-nextWeekly").innerHTML =
+          nextWeeklyEvent.toLocaleString("pt-PT", formatOptions);
+      } else {
+        document.getElementById("val-nextWeekly").innerHTML = "N/A";
+        const btn = document.querySelector("button[data-name='nextWeekly']");
+        btn && (btn.disabled = true);
+      }
+
+      // Get next monthly
+      const nextMonthlyEvent = getNextMonthlyOccurrence();
+      if (nextMonthlyEvent) {
+        document.getElementById("val-nextMonthly").innerHTML =
+          nextMonthlyEvent.toLocaleString("pt-PT", formatOptions);
+      } else {
+        document.getElementById("val-nextMonthly").innerHTML = "N/A";
+        const btn = document.querySelector("button[data-name='nextMonthly']");
+        btn && (btn.disabled = true);
+      }
+    }
+
+    function handleDateChange(event) {
+      populateTable();
+    }
+
+    function handleBtnClick(event) {
+      const dataName = event.currentTarget.dataset.name;
+      console.log(dataName);
+    }
 
     function populateTable() {
       const startDate = new Date(document.getElementById("start-time").value);
       const endDate = new Date(document.getElementById("end-time").value);
       endDate.setHours(23, 59, 59, 999);
 
-      const events = [
-        ...getDailyOccurrences(startDate, endDate).map((d) => ({
+      const dailyEvents = getDailyOccurrences(startDate, endDate);
+      const weeklyEvents = getWeeklyOccurrences(startDate, endDate);
+      const monthlyEvents = getMonthlyOccurrences(startDate, endDate);
+      const allEvents = [
+        ...dailyEvents.map((d) => ({
           class: "daily",
           type: "Diário",
           date: d,
           value: "20",
         })),
-        ...getWeeklyOccurrences(startDate, endDate).map((d) => ({
+        ...weeklyEvents.map((d) => ({
           class: "weekly",
           type: "Semanal",
           date: d,
           value: "100",
         })),
-        ...getMonthlyOccurrences(startDate, endDate).map((d) => ({
+        ...monthlyEvents.map((d) => ({
           class: "monthly",
           type: "Mensal",
           date: d,
@@ -106,13 +189,13 @@
 
       const weekDays = ["D", "2", "3", "4", "5", "6", "S"];
 
-      events.forEach((e) => {
+      allEvents.forEach((e) => {
         const row = document.createElement("tr");
         ((row.className = e.class),
           (row.innerHTML = `
           <td>${e.type}</td>
           <td>${e.date.toLocaleDateString("pt-PT")} - ${weekDays[e.date.getDay()]}</td>
-          <td>${e.date.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit", hour12: false })}</td>
+          <td>${e.date.toLocaleTimeString("pt-PT", { timeStyle: "short" })}</td>
           <td>${e.value}</td>
         `));
         tbody.appendChild(row);

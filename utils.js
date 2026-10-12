@@ -1,11 +1,16 @@
-// DAILY
-//   - início = 22/09/2021 07h12
-//   - hora ++ 1 | +7
-//   - min ++ 24
+/**
+ * DAILY
+ * - begin = 2021/09/22 07:12
+ * - hour > 23 ? ++7 : ++1
+ * - min ++24 % 60
+ * @param {Date} startDate 
+ * @param {Date} endDate 
+ * @returns List of daily occurrences between parameter dates
+ */
 function getDailyOccurrences(startDate, endDate) {
     const results = [];
 
-    const baseDate = new Date(2021, 8, 22); // 22/09/2021
+    const baseDate = new Date(2021, 8, 22);
     const baseHour = 7;
     const baseMinute = 12;
 
@@ -23,28 +28,44 @@ function getDailyOccurrences(startDate, endDate) {
             0,
         );
 
-        results.push(occurrence);
+        if (occurrence >= startDate && occurrence <= endDate) {
+            results.push(occurrence);
+        }
     }
 
     return results;
 }
 
-// WEEKLY
-//   - início = 25/09/2021 21h45
-//   - dia semana ++ 1
-//   - hora = 2f 11h, 3f 13h, 4f 15h, 5f 17h, 6f 19h, sáb 21h, dom 09h
-//   - min = 15 | 45, alternadamente
-const weeklyHours = {
-    0: 9, // Sunday
-    1: 11, // Monday
-    2: 13, // Tuesday
-    3: 15, // Wednesday
-    4: 17, // Thursday
-    5: 19, // Friday
-    6: 21, // Saturday
-};
+/**
+ * @returns Next daily occurence from now
+ */
+function getNextDailyOccurence() {
+    const now = new Date();
+    const next2Day = new Date(now);
+    next2Day.setDate(now.getDate() + 2);
+    return getDailyOccurrences(now, next2Day)[0];
+}
 
+/**
+ * WEEKLY
+ * - begin = 2021/09/25 21:45
+ * - weekday ++1 % monday
+ * - hour = M 11h, T 13h, W 15h, T 17h, F 19h, S 21h, S 9h
+ * - min = 15 | 45
+ * @param {Date} startDate 
+ * @param {Date} endDate 
+ * @returns List of weekly occurences between paramenter dates
+ */
 function getWeeklyOccurrences(startDate, endDate) {
+    const weeklyHours = {
+        0: 9, // Sunday
+        1: 11, // Monday
+        2: 13, // Tuesday
+        3: 15, // Wednesday
+        4: 17, // Thursday
+        5: 19, // Friday
+        6: 21, // Saturday
+    };
     const results = [];
 
     // start Saturday Date(2021, 8, 25, 21, 45); 25/09/2021
@@ -69,16 +90,16 @@ function getWeeklyOccurrences(startDate, endDate) {
             occurrence.setDate(occurrence.getDate() + weekday - 1);
         }
 
-        if (occurrence > endDate) {
-            break;
-        }
-
         occurrence.setHours(
             weeklyHours[weekday],
             weekIndex % 2 === 0 ? 45 : 15,
             0,
             0,
         );
+
+        if (occurrence > endDate) {
+            break;
+        }
 
         if (occurrence >= startDate) {
             results.push(occurrence);
@@ -90,10 +111,25 @@ function getWeeklyOccurrences(startDate, endDate) {
     return results;
 }
 
-// MONTHLY
-//   - início 25/09/2021 13h
-//   - último sábado
-//   - hora ++ 1 | +7
+/**
+ * @returns Next weekly occurence from now
+ */
+function getNextWeeklyOccurence() {
+    const now = new Date();
+    const next2Week = new Date(now);
+    next2Week.setDate(now.getDate() + 9);
+    return getWeeklyOccurrences(now, next2Week)[0];
+}
+
+/**
+ * MONTHLY
+ * - begin = 2021/09/25 13:00
+ * - last saturday
+ * - hour > 23 ? ++7 : ++1
+ * @param {Date} startDate 
+ * @param {Date} endDate 
+ * @returns List of montlhy occurrences between parameter dates
+ */
 function getMonthlyOccurrences(startDate, endDate) {
     const results = [];
 
@@ -128,4 +164,15 @@ function getMonthlyOccurrences(startDate, endDate) {
     }
 
     return results;
+}
+
+/**
+ * @returns Next monthly occurence from now
+ */
+function getNextMonthlyOccurrence() {
+    const now = new Date();
+    const next2Month = new Date(now);
+    // Start of next 2 month
+    next2Month.setMonth(now.getMonth() + 2, 1);
+    return getMonthlyOccurrences(now, next2Month)[0];
 }
