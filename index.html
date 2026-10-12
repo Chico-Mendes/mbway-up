@@ -145,8 +145,10 @@
       init();
     });
 
+    const eventsToAdd = {};
+
     function init() {
-      populateTable();
+      handleDateChange();
 
       const formatOptions = {
         dateStyle: "medium",
@@ -158,6 +160,7 @@
       if (nextDailyEvent) {
         document.getElementById("val-nextDaily").innerHTML =
           nextDailyEvent.toLocaleString("pt-PT", formatOptions);
+        eventsToAdd.nextDaily = nextDailyEvent;
       } else {
         document.getElementById("val-nextDaily").innerHTML = "N/A";
         const btn = document.querySelector("button[data-name='nextDaily']");
@@ -169,6 +172,7 @@
       if (nextWeeklyEvent) {
         document.getElementById("val-nextWeekly").innerHTML =
           nextWeeklyEvent.toLocaleString("pt-PT", formatOptions);
+        eventsToAdd.nextWeekly = nextWeeklyEvent;
       } else {
         document.getElementById("val-nextWeekly").innerHTML = "N/A";
         const btn = document.querySelector("button[data-name='nextWeekly']");
@@ -180,6 +184,7 @@
       if (nextMonthlyEvent) {
         document.getElementById("val-nextMonthly").innerHTML =
           nextMonthlyEvent.toLocaleString("pt-PT", formatOptions);
+        eventsToAdd.nextMonthly = nextMonthlyEvent;
       } else {
         document.getElementById("val-nextMonthly").innerHTML = "N/A";
         const btn = document.querySelector("button[data-name='nextMonthly']");
@@ -187,61 +192,38 @@
       }
     }
 
-    function handleDateChange(event) {
-      populateTable();
-    }
-
-    function handleBtnClick(event) {
-      const dataName = event.currentTarget.dataset.name;
-      console.log(dataName);
-    }
-
-    function populateTable() {
+    function handleDateChange() {
       const startDate = new Date(document.getElementById("start-time").value);
       const endDate = new Date(document.getElementById("end-time").value);
       endDate.setHours(23, 59, 59, 999);
 
-      const dailyEvents = getDailyOccurrences(startDate, endDate);
-      const weeklyEvents = getWeeklyOccurrences(startDate, endDate);
-      const monthlyEvents = getMonthlyOccurrences(startDate, endDate);
-      const allEvents = [
-        ...dailyEvents.map((d) => ({
-          class: "daily",
-          type: "Diário",
-          date: d,
-          value: "20",
-        })),
-        ...weeklyEvents.map((d) => ({
-          class: "weekly",
-          type: "Semanal",
-          date: d,
-          value: "100",
-        })),
-        ...monthlyEvents.map((d) => ({
-          class: "monthly",
-          type: "Mensal",
-          date: d,
-          value: "200",
-        })),
-      ].sort((a, b) => a.date - b.date);
+      eventsToAdd.allDaily = getDailyOccurrences(startDate, endDate);
+      eventsToAdd.allWeekly = getWeeklyOccurrences(startDate, endDate);
+      eventsToAdd.allMonthly = getMonthlyOccurrences(startDate, endDate);
 
       const tbody = document.getElementById("table-body");
+      const allEvents = {
+        daily: eventsToAdd.allDaily,
+        weekly: eventsToAdd.allWeekly,
+        monthly: eventsToAdd.allMonthly,
+      };
+      populateTable(tbody, allEvents);
+    }
 
-      tbody.innerHTML = "";
-
-      const weekDays = ["D", "2", "3", "4", "5", "6", "S"];
-
-      allEvents.forEach((e) => {
-        const row = document.createElement("tr");
-        ((row.className = e.class),
-          (row.innerHTML = `
-          <td>${e.type}</td>
-          <td>${e.date.toLocaleDateString("pt-PT")} - ${weekDays[e.date.getDay()]}</td>
-          <td>${e.date.toLocaleTimeString("pt-PT", { timeStyle: "short" })}</td>
-          <td>${e.value}</td>
-        `));
-        tbody.appendChild(row);
-      });
+    /**
+     * @param {Event} event
+     */
+    function handleBtnClick(event) {
+      const dataName = event.currentTarget.dataset.name;
+      if (dataName == "all") {
+        console.log(dataName, [
+          eventsToAdd.allDaily,
+          eventsToAdd.allWeekly,
+          eventsToAdd.allMonthly,
+        ]);
+      } else {
+        console.log(dataName, eventsToAdd[dataName]);
+      }
     }
   </script>
 </html>

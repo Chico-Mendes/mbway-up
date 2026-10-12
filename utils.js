@@ -176,3 +176,45 @@ function getNextMonthlyOccurrence() {
     next2Month.setMonth(now.getMonth() + 2, 1);
     return getMonthlyOccurrences(now, next2Month)[0];
 }
+
+/**
+ * @param {HTMLTableSectionElement} tbody 
+ * @param {{ daily: Date[], weekly: Date[], monthly: Date[] }} events 
+ */
+function populateTable(tbody, events) {
+    const allEvents = [
+        ...events.daily.map((d) => ({
+            class: "daily",
+            type: "Diário",
+            date: d,
+            value: "20",
+        })),
+        ...events.weekly.map((d) => ({
+            class: "weekly",
+            type: "Semanal",
+            date: d,
+            value: "100",
+        })),
+        ...events.monthly.map((d) => ({
+            class: "monthly",
+            type: "Mensal",
+            date: d,
+            value: "200",
+        })),
+    ].sort((a, b) => a.date - b.date);
+
+    const weekDays = ["D", "2", "3", "4", "5", "6", "S"];
+
+    tbody.innerHTML = "";
+    allEvents.forEach((e) => {
+        const row = document.createElement("tr");
+        ((row.className = e.class),
+            (row.innerHTML = `
+          <td>${e.type}</td>
+          <td>${e.date.toLocaleDateString("pt-PT")} - ${weekDays[e.date.getDay()]}</td>
+          <td>${e.date.toLocaleTimeString("pt-PT", { timeStyle: "short" })}</td>
+          <td>${e.value}</td>
+        `));
+        tbody.appendChild(row);
+    });
+}
