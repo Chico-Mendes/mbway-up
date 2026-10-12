@@ -44,25 +44,67 @@
 
     <details class="accordion">
       <summary>Adicionar ao calendário</summary>
-      <div class="cal-grid">
-        <p>Próximo prémio diário:</p>
-        <b id="val-nextDaily"></b>
-        <button name="addBtn" data-name="nextDaily">Adicionar</button>
-        <p>Próximo prémio semanal:</p>
-        <b id="val-nextWeekly"></b>
-        <button name="addBtn" data-name="nextWeekly">Adicionar</button>
-        <p>Próximo prémio mensal:</p>
-        <b id="val-nextMonthly"></b>
-        <button name="addBtn" data-name="nextMonthly">Adicionar</button>
-        <p>Todos os prémios diários no período escolhido</p>
-        <button name="addBtn" data-name="allDaily">Adicionar</button>
-        <p>Todos os prémios semanais no período escolhido</p>
-        <button name="addBtn" data-name="allWeekly">Adicionar</button>
-        <p>Todos os prémios mensais no período escolhido</p>
-        <button name="addBtn" data-name="allMonthly">Adicionar</button>
-        <p>Todos os prémios no período escolhido</p>
-        <button name="addBtn" data-name="all">Adicionar</button>
-      </div>
+      <table class="cal-table">
+        <tbody>
+          <tr>
+            <td>Próximo prémio diário:</td>
+            <td id="val-nextDaily"></td>
+            <td>
+              <button class="add2cal-btn" data-name="nextDaily">
+                Adicionar
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Próximo prémio semanal:</td>
+            <td id="val-nextWeekly"></td>
+            <td>
+              <button class="add2cal-btn" data-name="nextWeekly">
+                Adicionar
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Próximo prémio mensal:</td>
+            <td id="val-nextMonthly"></td>
+            <td>
+              <button class="add2cal-btn" data-name="nextMonthly">
+                Adicionar
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">Todos os prémios diários no período escolhido</td>
+            <td>
+              <button class="add2cal-btn" data-name="allDaily">
+                Adicionar
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">Todos os prémios semanais no período escolhido</td>
+            <td>
+              <button class="add2cal-btn" data-name="allWeekly">
+                Adicionar
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">Todos os prémios mensais no período escolhido</td>
+            <td>
+              <button class="add2cal-btn" data-name="allMonthly">
+                Adicionar
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">Todos os prémios no período escolhido</td>
+            <td>
+              <button class="add2cal-btn" data-name="all">Adicionar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </details>
 
     <table>
@@ -83,7 +125,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       const start = document.getElementById("start-time");
       const end = document.getElementById("end-time");
-      const addButtons = document.querySelectorAll("button[name='addBtn']");
+      const addButtons = document.querySelectorAll(".add2cal-btn");
 
       // Event listeners
       start.addEventListener("change", handleDateChange);

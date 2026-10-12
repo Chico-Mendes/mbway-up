@@ -62,48 +62,41 @@ thead {
   transform: rotate(-180deg);
 }
 
-.cal-grid {
-  display: grid;
-  width: fit-content;
+.cal-table {
   justify-self: center;
+  border: none;
+}
+
+.cal-table tr {
   align-items: center;
-  grid-template-columns: 1fr auto auto;
-  grid-auto-rows: 2.25rem;
-  gap: 0.25rem 1em;
+  border: none;
 }
 
-.cal-grid > p {
-  grid-column: 1 / 3;
+.cal-table td {
+  padding: 0.15rem 0.5em;
+}
+
+.cal-table tr > td:first-child {
   text-align: start;
-  margin: 0px;
 }
 
-.cal-grid > p:has(+ b) {
-  grid-column: 1;
-}
-
-.cal-grid > p + b {
-  grid-column: 2;
-}
-
-.cal-grid > button {
-  grid-column: 3;
+.add2cal-btn {
   cursor: pointer;
-  height: stretch;
+  height: 2.25rem;
   color: white;
   background-color: black;
   border-radius: 5px;
 }
 
-.cal-grid > button:hover {
+.add2cal-btn:hover {
   background-color: #333;
 }
 
-.cal-grid > button:active {
+.add2cal-btn:active {
   background-color: #555;
 }
 
-.cal-grid > button:disabled {
+.add2cal-btn:disabled {
   cursor: default;
   color: #999;
   background-color: #333;
