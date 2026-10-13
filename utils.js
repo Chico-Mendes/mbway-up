@@ -246,7 +246,6 @@ function generateEventLink(text, date, value) {
         "&dates=" + fdate + "/" + fdate +
         "&details=" + details
     )
-    console.log(link);
     return link;
 }
 
