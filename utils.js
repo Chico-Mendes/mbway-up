@@ -218,3 +218,55 @@ function populateTable(tbody, events) {
         tbody.appendChild(row);
     });
 }
+
+/**
+ * @param {Date} date 
+ * @returns {string} Google compliant datetime format
+ */
+function formatGoogleDate(date) {
+    return date?.toISOString()
+        .replace(/[-:]/g, "")
+        .replace(/\.\d{3}Z$/, "Z");
+}
+
+/**
+ * @param {string} text 
+ * @param {Date} date 
+ * @param {Number} value Reward value
+ * @returns Google Create Event URL
+ */
+function generateEventLink(text, date, value) {
+    const title = encodeURIComponent(`MBWAY : Prémio ${text}`);
+    const fdate = formatGoogleDate(date);
+    const details = encodeURIComponent(`Prémio de ${value}€`);
+
+    const link = (
+        "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+        "&text=" + title +
+        "&dates=" + fdate + "/" + fdate +
+        "&details=" + details
+    )
+    console.log(link);
+    return link;
+}
+
+/**
+ * @param {Date} date 
+ */
+function generateDailyEventLink(date) {
+    return generateEventLink("Diário", date, 20);
+}
+
+/**
+ * @param {Date} date 
+ */
+function generateWeeklyEventLink(date) {
+    return generateEventLink("Semanal", date, 100);
+}
+
+/**
+ * @param {Date} date 
+ */
+function generateMonthlyEventLink(date) {
+    return generateEventLink("Mensal", date, 200);
+}

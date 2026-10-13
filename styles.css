@@ -72,6 +72,7 @@ thead {
   border: none;
 }
 
+.cal-table th,
 .cal-table td {
   padding: 0.15rem 0.5em;
 }
@@ -82,7 +83,9 @@ thead {
 
 .add2cal-btn {
   cursor: pointer;
+  width: stretch;
   height: 2.25rem;
+  padding-inline: 10px;
   color: white;
   background-color: black;
   border-radius: 5px;

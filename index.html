@@ -48,28 +48,28 @@
         <tbody>
           <tr>
             <td>Próximo prémio diário:</td>
-            <td id="val-nextDaily"></td>
+            <th id="val-nextDaily"></th>
             <td>
               <button class="add2cal-btn" data-name="nextDaily">
-                Adicionar
+                Adicionar (Google Calendar)
               </button>
             </td>
           </tr>
           <tr>
             <td>Próximo prémio semanal:</td>
-            <td id="val-nextWeekly"></td>
+            <th id="val-nextWeekly"></th>
             <td>
               <button class="add2cal-btn" data-name="nextWeekly">
-                Adicionar
+                Adicionar (Google Calendar)
               </button>
             </td>
           </tr>
           <tr>
             <td>Próximo prémio mensal:</td>
-            <td id="val-nextMonthly"></td>
+            <th id="val-nextMonthly"></th>
             <td>
               <button class="add2cal-btn" data-name="nextMonthly">
-                Adicionar
+                Adicionar (Google Calendar)
               </button>
             </td>
           </tr>
@@ -77,7 +77,7 @@
             <td colspan="2">Todos os prémios diários no período escolhido</td>
             <td>
               <button class="add2cal-btn" data-name="allDaily">
-                Adicionar
+                Adicionar (ficheiro .ics)
               </button>
             </td>
           </tr>
@@ -85,7 +85,7 @@
             <td colspan="2">Todos os prémios semanais no período escolhido</td>
             <td>
               <button class="add2cal-btn" data-name="allWeekly">
-                Adicionar
+                Adicionar (ficheiro .ics)
               </button>
             </td>
           </tr>
@@ -93,14 +93,16 @@
             <td colspan="2">Todos os prémios mensais no período escolhido</td>
             <td>
               <button class="add2cal-btn" data-name="allMonthly">
-                Adicionar
+                Adicionar (ficheiro .ics)
               </button>
             </td>
           </tr>
           <tr>
             <td colspan="2">Todos os prémios no período escolhido</td>
             <td>
-              <button class="add2cal-btn" data-name="all">Adicionar</button>
+              <button class="add2cal-btn" data-name="all">
+                Adicionar (ficheiro .ics)
+              </button>
             </td>
           </tr>
         </tbody>
@@ -145,6 +147,7 @@
       init();
     });
 
+    /** @type {{ daily: Date[], weekly: Date[], monthly: Date[] }} */
     const eventsToAdd = {};
 
     function init() {
@@ -157,37 +160,40 @@
 
       // Get next daily
       const nextDailyEvent = getNextDailyOccurence();
+      let btn = document.querySelector("button[data-name='nextDaily']");
       if (nextDailyEvent) {
         document.getElementById("val-nextDaily").innerHTML =
           nextDailyEvent.toLocaleString("pt-PT", formatOptions);
-        eventsToAdd.nextDaily = nextDailyEvent;
+        const link = generateDailyEventLink(nextDailyEvent);
+        btn && (btn.dataset.link = link);
       } else {
         document.getElementById("val-nextDaily").innerHTML = "N/A";
-        const btn = document.querySelector("button[data-name='nextDaily']");
         btn && (btn.disabled = true);
       }
 
       // Get next weekly
       const nextWeeklyEvent = getNextWeeklyOccurence();
+      btn = document.querySelector("button[data-name='nextWeekly']");
       if (nextWeeklyEvent) {
         document.getElementById("val-nextWeekly").innerHTML =
           nextWeeklyEvent.toLocaleString("pt-PT", formatOptions);
-        eventsToAdd.nextWeekly = nextWeeklyEvent;
+        const link = generateWeeklyEventLink(nextWeeklyEvent);
+        btn && (btn.dataset.link = link);
       } else {
         document.getElementById("val-nextWeekly").innerHTML = "N/A";
-        const btn = document.querySelector("button[data-name='nextWeekly']");
         btn && (btn.disabled = true);
       }
 
       // Get next monthly
       const nextMonthlyEvent = getNextMonthlyOccurrence();
+      btn = document.querySelector("button[data-name='nextMonthly']");
       if (nextMonthlyEvent) {
         document.getElementById("val-nextMonthly").innerHTML =
           nextMonthlyEvent.toLocaleString("pt-PT", formatOptions);
-        eventsToAdd.nextMonthly = nextMonthlyEvent;
+        const link = generateMonthlyEventLink(nextMonthlyEvent);
+        btn && (btn.dataset.link = link);
       } else {
         document.getElementById("val-nextMonthly").innerHTML = "N/A";
-        const btn = document.querySelector("button[data-name='nextMonthly']");
         btn && (btn.disabled = true);
       }
     }
@@ -197,17 +203,12 @@
       const endDate = new Date(document.getElementById("end-time").value);
       endDate.setHours(23, 59, 59, 999);
 
-      eventsToAdd.allDaily = getDailyOccurrences(startDate, endDate);
-      eventsToAdd.allWeekly = getWeeklyOccurrences(startDate, endDate);
-      eventsToAdd.allMonthly = getMonthlyOccurrences(startDate, endDate);
+      eventsToAdd.daily = getDailyOccurrences(startDate, endDate);
+      eventsToAdd.weekly = getWeeklyOccurrences(startDate, endDate);
+      eventsToAdd.monthly = getMonthlyOccurrences(startDate, endDate);
 
       const tbody = document.getElementById("table-body");
-      const allEvents = {
-        daily: eventsToAdd.allDaily,
-        weekly: eventsToAdd.allWeekly,
-        monthly: eventsToAdd.allMonthly,
-      };
-      populateTable(tbody, allEvents);
+      populateTable(tbody, eventsToAdd);
     }
 
     /**
@@ -215,14 +216,28 @@
      */
     function handleBtnClick(event) {
       const dataName = event.currentTarget.dataset.name;
-      if (dataName == "all") {
-        console.log(dataName, [
-          eventsToAdd.allDaily,
-          eventsToAdd.allWeekly,
-          eventsToAdd.allMonthly,
-        ]);
-      } else {
-        console.log(dataName, eventsToAdd[dataName]);
+
+      switch (dataName) {
+        case "nextDaily":
+        case "nextWeekly":
+        case "nextMonthly":
+          window.open(event.currentTarget.dataset.link, "_blank");
+          break;
+        case "allDaily":
+          console.log(dataName, eventsToAdd[dataName]);
+          break;
+        case "allWeekly":
+          console.log(dataName, eventsToAdd[dataName]);
+          break;
+        case "allMonthly":
+          console.log(dataName, eventsToAdd[dataName]);
+          break;
+        case "all":
+          console.log(dataName, eventsToAdd);
+          break;
+        default:
+          console.error("ERROR: wrong data-name!");
+          break;
       }
     }
   </script>
