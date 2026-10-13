@@ -37,16 +37,6 @@ function getDailyOccurrences(startDate, endDate) {
 }
 
 /**
- * @returns Next daily occurence from now
- */
-function getNextDailyOccurence() {
-    const now = new Date();
-    const next2Day = new Date(now);
-    next2Day.setDate(now.getDate() + 2);
-    return getDailyOccurrences(now, next2Day)[0];
-}
-
-/**
  * WEEKLY
  * - begin = 2021/09/25 21:45
  * - weekday ++1 % monday
@@ -112,16 +102,6 @@ function getWeeklyOccurrences(startDate, endDate) {
 }
 
 /**
- * @returns Next weekly occurence from now
- */
-function getNextWeeklyOccurence() {
-    const now = new Date();
-    const next2Week = new Date(now);
-    next2Week.setDate(now.getDate() + 9);
-    return getWeeklyOccurrences(now, next2Week)[0];
-}
-
-/**
  * MONTHLY
  * - begin = 2021/09/25 13:00
  * - last saturday
@@ -164,17 +144,6 @@ function getMonthlyOccurrences(startDate, endDate) {
     }
 
     return results;
-}
-
-/**
- * @returns Next monthly occurence from now
- */
-function getNextMonthlyOccurrence() {
-    const now = new Date();
-    const next2Month = new Date(now);
-    // Start of next 2 month
-    next2Month.setMonth(now.getMonth() + 2, 1);
-    return getMonthlyOccurrences(now, next2Month)[0];
 }
 
 /**

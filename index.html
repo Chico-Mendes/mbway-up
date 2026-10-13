@@ -33,12 +33,12 @@
 
     <div class="date-pickers">
       <div>
-        <label for="start-time">Início:</label>
-        <input type="date" id="start-time" name="start-time" min="2021-09-22" />
+        <label for="start-date">Início:</label>
+        <input type="date" id="start-date" name="start-date" min="2021-09-22" />
       </div>
       <div>
-        <label for="end-time">Fim:</label>
-        <input type="date" id="end-time" name="end-time" min="2021-09-22" />
+        <label for="end-date">Fim:</label>
+        <input type="date" id="end-date" name="end-date" min="2021-09-22" />
       </div>
     </div>
 
@@ -125,8 +125,8 @@
   <script src="utils.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const start = document.getElementById("start-time");
-      const end = document.getElementById("end-time");
+      const start = document.getElementById("start-date");
+      const end = document.getElementById("end-date");
       const addButtons = document.querySelectorAll(".add2cal-btn");
 
       // Event listeners
@@ -159,48 +159,41 @@
       };
 
       // Get next daily
-      const nextDailyEvent = getNextDailyOccurence();
+      const nextDailyEvent = eventsToAdd.daily[0];
+      document.getElementById("val-nextDaily").innerHTML =
+        nextDailyEvent.toLocaleString("pt-PT", formatOptions);
       let btn = document.querySelector("button[data-name='nextDaily']");
-      if (nextDailyEvent) {
-        document.getElementById("val-nextDaily").innerHTML =
-          nextDailyEvent.toLocaleString("pt-PT", formatOptions);
-        const link = generateDailyEventLink(nextDailyEvent);
-        btn && (btn.dataset.link = link);
-      } else {
-        document.getElementById("val-nextDaily").innerHTML = "N/A";
-        btn && (btn.disabled = true);
-      }
+      let link = generateDailyEventLink(nextDailyEvent);
+      btn && (btn.dataset.link = link);
 
       // Get next weekly
-      const nextWeeklyEvent = getNextWeeklyOccurence();
+      const nextWeeklyEvent = eventsToAdd.weekly[0];
+      document.getElementById("val-nextWeekly").innerHTML =
+        nextWeeklyEvent.toLocaleString("pt-PT", formatOptions);
       btn = document.querySelector("button[data-name='nextWeekly']");
-      if (nextWeeklyEvent) {
-        document.getElementById("val-nextWeekly").innerHTML =
-          nextWeeklyEvent.toLocaleString("pt-PT", formatOptions);
-        const link = generateWeeklyEventLink(nextWeeklyEvent);
-        btn && (btn.dataset.link = link);
-      } else {
-        document.getElementById("val-nextWeekly").innerHTML = "N/A";
-        btn && (btn.disabled = true);
-      }
+      link = generateWeeklyEventLink(nextWeeklyEvent);
+      btn && (btn.dataset.link = link);
 
       // Get next monthly
-      const nextMonthlyEvent = getNextMonthlyOccurrence();
+      const nextMonthlyEvent = eventsToAdd.monthly[0];
+      document.getElementById("val-nextMonthly").innerHTML =
+        nextMonthlyEvent.toLocaleString("pt-PT", formatOptions);
       btn = document.querySelector("button[data-name='nextMonthly']");
-      if (nextMonthlyEvent) {
-        document.getElementById("val-nextMonthly").innerHTML =
-          nextMonthlyEvent.toLocaleString("pt-PT", formatOptions);
-        const link = generateMonthlyEventLink(nextMonthlyEvent);
-        btn && (btn.dataset.link = link);
-      } else {
-        document.getElementById("val-nextMonthly").innerHTML = "N/A";
-        btn && (btn.disabled = true);
-      }
+      link = generateMonthlyEventLink(nextMonthlyEvent);
+      btn && (btn.dataset.link = link);
     }
 
-    function handleDateChange() {
-      const startDate = new Date(document.getElementById("start-time").value);
-      const endDate = new Date(document.getElementById("end-time").value);
+    function handleDateChange(event) {
+      let startDate, endDate;
+      if (event instanceof Event) {
+        startDate = new Date(document.getElementById("start-date").value);
+        endDate = new Date(document.getElementById("end-date").value);
+      } else {
+        // Initialization
+        startDate = new Date();
+        endDate = new Date(startDate);
+        endDate.setMonth(startDate.getMonth() + 2);
+      }
       endDate.setHours(23, 59, 59, 999);
 
       eventsToAdd.daily = getDailyOccurrences(startDate, endDate);
